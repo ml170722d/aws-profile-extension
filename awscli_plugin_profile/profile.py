@@ -1,54 +1,105 @@
-"""Profile switching command implementation."""
+"""Profile switching implementation (standalone, no awscli dependency)."""
 
 import os
 import sys
-import json
 import subprocess
-from datetime import datetime, timezone
 from pathlib import Path
 
 import boto3
 import botocore
 from botocore.exceptions import ClientError, ProfileNotFound, TokenRetrievalError
-from awscli.customizations.commands import BasicCommand
 
 
-class ProfileCommand(BasicCommand):
-    """Command to switch AWS profiles with automatic SSO login."""
+class ProfileManager:
+    """Manages AWS profile switching and SSO login."""
 
-    NAME = 'profile'
-    DESCRIPTION = 'Switch AWS profiles with automatic SSO login and credential validation'
-    SYNOPSIS = 'aws profile <profile-name>'
-    EXAMPLES = (
-        'To switch to a profile named "dev":\n'
-        '  $ aws profile dev\n\n'
-        'To list available profiles:\n'
-        '  $ aws profile --list\n'
-    )
+    def list_profiles(self):
+        """List all available AWS profiles."""
+        try:
+            config_path = Path.home() / '.aws' / 'config'
+            credentials_path = Path.home() / '.aws' / 'credentials'
+            profiles = set()
 
-    ARG_TABLE = [
-        {
-            'name': 'profile-name',
-            'help_text': 'Name of the AWS profile to switch to',
-            'action': 'store',
-            'required': False,
-            'positional_arg': True,
-        },
-        {
-            'name': 'list',
-            'help_text': 'List all available AWS profiles',
-            'action': 'store_true',
-            'required': False,
-        },
-    ]
+            # Parse config file
+            if config_path.exists():
+                with open(config_path, 'r') as f:
+                    for line in f:
+                        line = line.strip()
+                        if line.startswith('[profile '):
+                            profile = line[9:-1].strip()  # Extract profile name
+                            profiles.add(profile)
+                        elif line == '[default]':
+                            profiles.add('default')
 
-    @staticmethod
-    def add_command(command_table, session, **kwargs):
-        """Add the profile command to the AWS CLI command table."""
-        command_table['profile'] = ProfileCommand(session)
+            # Parse credentials file
+            if credentials_path.exists():
+                with open(credentials_path, 'r') as f:
+                    for line in f:
+                        line = line.strip()
+                        if line.startswith('[') and line.endswith(']'):
+                            profile = line[1:-1].strip()
+                            profiles.add(profile)
 
-    def _run_main(self, parsed_args, parsed_globals):
-        """Main execution method for the profile command."""
+            if not profiles:
+                sys.stdout.write('No AWS profiles found\n')
+                return 0
+
+            sys.stdout.write('Available AWS profiles:\n')
+            for profile in sorted(profiles):
+                # Check if SSO profile
+                sso_indicator = ' (SSO)' if self._is_sso_profile(profile) else ''
+                # Check if credentials are valid
+                valid_indicator = ' ✓' if self._credentials_valid(profile) else ' ✗'
+                sys.stdout.write(f'  - {profile}{sso_indicator}{valid_indicator}\n')
+
+            sys.stdout.write('\n✓ = credentials valid, ✗ = credentials expired/invalid\n')
+            return 0
+
+        except Exception as e:
+            sys.stderr.write(f'Error listing profiles: {str(e)}\n')
+            return 1
+
+    def switch_profile(self, profile_name):
+        """Switch to a profile with automatic SSO login if needed."""
+        try:
+            # Check if profile exists
+            if not self._profile_exists(profile_name):
+                sys.stderr.write(f'Error: Profile "{profile_name}" not found in AWS config\n')
+                sys.stderr.write('Run "aws-profile --list" to see available profiles\n')
+                return 1
+
+            # Check if credentials are valid
+            if not self._credentials_valid(profile_name):
+                sys.stdout.write(f'Credentials expired or not found for profile "{profile_name}"\n')
+
+                # Check if it's an SSO profile
+                if self._is_sso_profile(profile_name):
+                    sys.stdout.write(f'Logging in to SSO for profile "{profile_name}"...\n')
+                    if not self._sso_login(profile_name):
+                        sys.stderr.write('Error: SSO login failed\n')
+                        return 1
+                    sys.stdout.write('SSO login successful\n')
+                else:
+                    sys.stderr.write('Error: Credentials are not valid and profile is not configured for SSO\n')
+                    return 1
+            else:
+                sys.stdout.write(f'Credentials are valid for profile "{profile_name}"\n')
+
+            # Set the environment variable
+            self._set_profile_env(profile_name)
+
+            # Output for shell evaluation
+            sys.stdout.write(f'\nProfile switched to: {profile_name}\n')
+            sys.stdout.write(f'\nTo use in your shell, run:\n')
+            sys.stdout.write(f'  export AWS_PROFILE={profile_name}\n')
+            sys.stdout.write(f'\nOr use the shell function:\n')
+            sys.stdout.write(f'  awsp {profile_name}\n')
+
+            return 0
+
+        except Exception as e:
+            sys.stderr.write(f'Error: {str(e)}\n')
+            return 1
 
         # Handle list profiles
         if parsed_args.list:
@@ -147,9 +198,10 @@ class ProfileCommand(BasicCommand):
         """Perform SSO login for a profile."""
         try:
             # Use subprocess to call aws sso login
+            # Keep stdin attached for interactive authentication
             result = subprocess.run(
                 ['aws', 'sso', 'login', '--profile', profile_name],
-                capture_output=False,
+                stdin=None,  # Inherit parent stdin for interactivity
                 text=True
             )
 

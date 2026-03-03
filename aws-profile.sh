@@ -12,15 +12,13 @@ awsp() {
         return 1
     fi
 
-    # Run the aws profile command
+    # Run the aws-profile command (standalone)
     if [ "$profile_name" = "--list" ] || [ "$profile_name" = "-l" ]; then
-        aws profile --list
+        aws-profile --list
     else
-        # Capture output and check if command succeeded
-        output=$(aws profile "$profile_name" 2>&1)
+        # Run without capturing output to allow interactive SSO login
+        aws-profile "$profile_name"
         result=$?
-
-        echo "$output"
 
         if [ $result -eq 0 ]; then
             # Set the environment variable
