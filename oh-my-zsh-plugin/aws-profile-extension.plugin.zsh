@@ -90,9 +90,8 @@ compdef _awsp_complete awsp
 
 # Aliases for convenience
 alias awsprofile="awsp"
-alias ap="awsp"  # Short alias
 
-# Show plugin loaded message
-if [[ -o interactive ]]; then
-    echo "🚀 AWS Profile Switcher loaded! Use: awsp --list"
-fi
+# # Show plugin loaded message
+# if [[ -o interactive ]]; then
+#     echo "🚀 AWS Profile Switcher loaded! Use: awsp --list"
+# fi
