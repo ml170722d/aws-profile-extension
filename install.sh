@@ -74,6 +74,8 @@ install_oh_my_zsh_plugin() {
     python3 -m venv venv
     source venv/bin/activate
 
+    cp oh-my-zsh-plugin/aws-profile-extension.plugin.zsh aws-profile-extension.plugin.zsh
+
     # Install dependencies
     pip install --upgrade pip boto3 botocore
     pip install -e .
