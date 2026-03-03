@@ -74,11 +74,23 @@ install_oh_my_zsh_plugin() {
     python3 -m venv venv
     source venv/bin/activate
 
-    cp oh-my-zsh-plugin/aws-profile-extension.plugin.zsh aws-profile-extension.plugin.zsh
-
     # Install dependencies
     pip install --upgrade pip boto3 botocore
     pip install -e .
+
+    # Create wrapper script for aws-profile command
+    log_info "Creating wrapper script..."
+    cat > aws-profile-wrapper.sh << 'EOF'
+#!/bin/bash
+# AWS Profile Wrapper - activates venv and runs aws-profile
+PLUGIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$PLUGIN_DIR/venv/bin/activate"
+exec "$PLUGIN_DIR/venv/bin/aws-profile" "$@"
+EOF
+    chmod +x aws-profile-wrapper.sh
+
+    # Copy and update plugin file
+    cp oh-my-zsh-plugin/aws-profile-extension.plugin.zsh aws-profile-extension.plugin.zsh
 
     log_success "Oh My Zsh plugin installed successfully!"
     echo ""

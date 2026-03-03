@@ -1,6 +1,9 @@
 # AWS Profile Switcher - Oh My Zsh Plugin
 # Easy AWS profile switching with SSO support
 
+# Get the directory where this plugin is located
+PLUGIN_DIR="${0:A:h}"
+
 # Plugin main functionality
 awsp() {
     local profile_name="$1"
@@ -11,14 +14,16 @@ awsp() {
         return 1
     fi
 
-    # Check if aws-profile command exists, if not use fallback
-    if command -v aws-profile >/dev/null 2>&1; then
-        # Use the Python-based standalone command
+    # Use the wrapper script that handles virtual environment
+    local wrapper_script="$PLUGIN_DIR/aws-profile-wrapper.sh"
+
+    if [ -f "$wrapper_script" ]; then
+        # Use the self-contained wrapper
         if [ "$profile_name" = "--list" ] || [ "$profile_name" = "-l" ]; then
-            aws-profile --list
+            "$wrapper_script" --list
         else
             # Run without capturing output to allow interactive SSO login
-            aws-profile "$profile_name"
+            "$wrapper_script" "$profile_name"
             result=$?
 
             if [ $result -eq 0 ]; then
@@ -31,9 +36,10 @@ awsp() {
             fi
         fi
     else
-        # Fallback to AWS CLI v2 direct usage (if aws-profile not available)
-        echo "aws-profile command not found. Please install the AWS Profile Switcher package."
-        echo "See: https://github.com/ml170722d/aws-profile-extension"
+        # Fallback error message
+        echo "❌ AWS Profile Switcher not properly installed."
+        echo "Expected wrapper script: $wrapper_script"
+        echo "Try reinstalling: ./install.sh --oh-my-zsh"
         return 1
     fi
 }
