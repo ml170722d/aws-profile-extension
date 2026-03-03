@@ -1,8 +1,8 @@
-name: aws-profile-switcher
+name: aws-profile-extension
 description: "Easy AWS profile switching with SSO support and tab completion"
 author: "Luka Matovic"
-version: "2.0.0"
-website: "https://github.com/YOUR_USERNAME/aws-profile-switcher"
+version: "1.0.0"
+website: "https://github.com/ml170722d/aws-profile-extension"
 dependencies:
   - git
   - python3

@@ -13,10 +13,10 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-REPO_URL="https://github.com/YOUR_USERNAME/aws-profile"
-PLUGIN_NAME="aws-profile"
-INSTALL_DIR="$HOME/.aws-profile"
-VENV_DIR="$INSTALL_DIR/.venv"
+REPO_URL="https://github.com/ml170722d/aws-profile-extension"
+PLUGIN_NAME="aws-profile-extension"
+INSTALL_DIR="$HOME/.aws-profile-extension"
+VENV_DIR="$INSTALL_DIR/venv"
 
 # Helper functions
 log_info() {

@@ -33,7 +33,7 @@ awsp() {
     else
         # Fallback to AWS CLI v2 direct usage (if aws-profile not available)
         echo "aws-profile command not found. Please install the AWS Profile Switcher package."
-        echo "See: https://github.com/YOUR_USERNAME/aws-profile-switcher"
+        echo "See: https://github.com/ml170722d/aws-profile-extension"
         return 1
     fi
 }

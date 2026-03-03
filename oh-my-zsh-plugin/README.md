@@ -6,17 +6,17 @@ If you have Oh My Zsh installed, this is the easiest installation method:
 
 ```bash
 # Clone into your Oh My Zsh custom plugins directory
-git clone https://github.com/YOUR_USERNAME/aws-profile-switcher ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/aws-profile-switcher
+git clone https://github.com/ml170722d/aws-profile-extension ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/aws-profile-extension
 ```
 
 ## Plugin Configuration
 
-Add `aws-profile-switcher` to your plugins list in `~/.zshrc`:
+Add `aws-profile-extension` to your plugins list in `~/.zshrc`:
 
 ```bash
 plugins=(
     # your existing plugins...
-    aws-profile-switcher
+    aws-profile-extension
 )
 ```
 
@@ -64,7 +64,7 @@ The plugin will automatically create a Python virtual environment and install re
 
 ## Plugin Structure
 
-- `aws-profile-switcher.plugin.zsh` - Main plugin file with shell functions
+- `aws-profile-extension.plugin.zsh` - Main plugin file with shell functions
 - `awscli_plugin_profile/` - Python package for profile management
 - `setup.py` - Python package configuration
 - `requirements.txt` - Python dependencies
@@ -89,6 +89,6 @@ If you experience issues:
 
 ## See Also
 
-- Main repository: https://github.com/YOUR_USERNAME/aws-profile-switcher
+- Main repository: <https://github.com/ml170722d/aws-profile-extension>
 - Standalone installation instructions
 - Development setup guide
