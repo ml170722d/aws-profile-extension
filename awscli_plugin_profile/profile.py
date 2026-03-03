@@ -83,69 +83,19 @@ class ProfileManager:
                     sys.stderr.write('Error: Credentials are not valid and profile is not configured for SSO\n')
                     return 1
             else:
-                sys.stdout.write(f'Credentials are valid for profile "{profile_name}"\n')
+                # sys.stdout.write(f'Credentials are valid for profile "{profile_name}"\n')
+                pass
+
 
             # Set the environment variable
             self._set_profile_env(profile_name)
 
             # Output for shell evaluation
             sys.stdout.write(f'\nProfile switched to: {profile_name}\n')
-            sys.stdout.write(f'\nTo use in your shell, run:\n')
-            sys.stdout.write(f'  export AWS_PROFILE={profile_name}\n')
-            sys.stdout.write(f'\nOr use the shell function:\n')
-            sys.stdout.write(f'  awsp {profile_name}\n')
-
-            return 0
-
-        except Exception as e:
-            sys.stderr.write(f'Error: {str(e)}\n')
-            return 1
-
-        # Handle list profiles
-        if parsed_args.list:
-            return self._list_profiles()
-
-        # Get profile name
-        profile_name = getattr(parsed_args, 'profile-name', None) or getattr(parsed_args, 'profile_name', None)
-
-        if not profile_name:
-            sys.stderr.write('Error: Please specify a profile name or use --list to see available profiles\n')
-            return 1
-
-        try:
-            # Check if profile exists
-            if not self._profile_exists(profile_name):
-                sys.stderr.write(f'Error: Profile "{profile_name}" not found in AWS config\n')
-                sys.stderr.write('Run "aws profile --list" to see available profiles\n')
-                return 1
-
-            # Check if credentials are valid
-            if not self._credentials_valid(profile_name):
-                sys.stdout.write(f'Credentials expired or not found for profile "{profile_name}"\n')
-
-                # Check if it's an SSO profile
-                if self._is_sso_profile(profile_name):
-                    sys.stdout.write(f'Logging in to SSO for profile "{profile_name}"...\n')
-                    if not self._sso_login(profile_name):
-                        sys.stderr.write('Error: SSO login failed\n')
-                        return 1
-                    sys.stdout.write('SSO login successful\n')
-                else:
-                    sys.stderr.write('Error: Credentials are not valid and profile is not configured for SSO\n')
-                    return 1
-            else:
-                sys.stdout.write(f'Credentials are valid for profile "{profile_name}"\n')
-
-            # Set the environment variable
-            self._set_profile_env(profile_name)
-
-            # Output for shell evaluation
-            sys.stdout.write(f'\nProfile switched to: {profile_name}\n')
-            sys.stdout.write(f'\nTo use in your shell, run:\n')
-            sys.stdout.write(f'  export AWS_PROFILE={profile_name}\n')
-            sys.stdout.write(f'\nOr use the alias (add to your .bashrc or .zshrc):\n')
-            sys.stdout.write(f'  alias awsp=\'function _aws_profile() {{ aws profile "$1" && export AWS_PROFILE="$1"; }}; _aws_profile\'\n')
-            sys.stdout.write(f'\nThen you can simply run: awsp {profile_name}\n')
+            # sys.stdout.write(f'\nTo use in your shell, run:\n')
+            # sys.stdout.write(f'  export AWS_PROFILE={profile_name}\n')
+            # sys.stdout.write(f'\nOr use the shell function:\n')
+            # sys.stdout.write(f'  awsp {profile_name}\n')
 
             return 0
 

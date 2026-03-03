@@ -29,8 +29,8 @@ awsp() {
             if [ $result -eq 0 ]; then
                 # Set the environment variable
                 export AWS_PROFILE="$profile_name"
-                echo ""
-                echo "✓ AWS_PROFILE is now set to: $profile_name"
+                # echo ""
+                # echo "✓ AWS_PROFILE is now set to: $profile_name"
             else
                 return $result
             fi
