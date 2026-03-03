@@ -89,7 +89,7 @@ exec "$PLUGIN_DIR/venv/bin/aws-profile" "$@"
 EOF
     chmod +x aws-profile-wrapper.sh
 
-    # Copy and update plugin file
+    # Copy and update plugin file (with corrected zsh completion)
     cp oh-my-zsh-plugin/aws-profile-extension.plugin.zsh aws-profile-extension.plugin.zsh
 
     log_success "Oh My Zsh plugin installed successfully!"

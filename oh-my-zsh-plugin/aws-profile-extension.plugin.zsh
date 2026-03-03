@@ -61,15 +61,15 @@ aws-clear-profile() {
 
 # Completion function for awsp
 _awsp_complete() {
-    local cur="${words[COMP_CWORD]}"
-    local profiles=()
+    local -a profiles
+    local line
 
     # Read profiles from config file
     if [ -f ~/.aws/config ]; then
         while IFS= read -r line; do
-            if [[ $line =~ ^\[profile\ (.+)\] ]]; then
+            if [[ $line =~ '^\[profile ([^]]+)\]' ]]; then
                 profiles+=("${match[1]}")
-            elif [[ $line =~ ^\[default\] ]]; then
+            elif [[ $line =~ '^\[default\]' ]]; then
                 profiles+=("default")
             fi
         done < ~/.aws/config
@@ -78,7 +78,7 @@ _awsp_complete() {
     # Read profiles from credentials file
     if [ -f ~/.aws/credentials ]; then
         while IFS= read -r line; do
-            if [[ $line =~ ^\[(.+)\] ]]; then
+            if [[ $line =~ '^\[([^]]+)\]' ]]; then
                 profiles+=("${match[1]}")
             fi
         done < ~/.aws/credentials
@@ -88,7 +88,7 @@ _awsp_complete() {
     profiles+=(--list -l)
 
     # Generate completions
-    compadd -a profiles
+    _describe 'aws profiles' profiles
 }
 
 # Register completion function
