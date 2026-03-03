@@ -13,9 +13,9 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-REPO_URL="https://github.com/YOUR_USERNAME/aws-profile-switcher"
-PLUGIN_NAME="aws-profile-switcher"
-INSTALL_DIR="$HOME/.aws-profile-switcher"
+REPO_URL="https://github.com/ml170722d/aws-profile-extension"
+PLUGIN_NAME="aws-profile-extension"
+INSTALL_DIR="$HOME/.aws-profile-extension"
 VENV_DIR="$INSTALL_DIR/venv"
 
 # Helper functions
@@ -54,9 +54,9 @@ detect_installation_method() {
 # Install Oh My Zsh plugin
 install_oh_my_zsh_plugin() {
     log_info "Installing as Oh My Zsh plugin..."
-    
+
     local plugin_dir="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/$PLUGIN_NAME"
-    
+
     # Clone or update repository
     if [ -d "$plugin_dir" ]; then
         log_info "Plugin directory exists, updating..."
@@ -65,19 +65,19 @@ install_oh_my_zsh_plugin() {
         log_info "Cloning repository to $plugin_dir"
         git clone "$REPO_URL" "$plugin_dir"
     fi
-    
+
     # Install Python package in plugin directory
     cd "$plugin_dir"
-    
+
     # Create virtual environment
     log_info "Creating Python virtual environment..."
     python3 -m venv venv
     source venv/bin/activate
-    
+
     # Install dependencies
     pip install --upgrade pip boto3 botocore
     pip install -e .
-    
+
     log_success "Oh My Zsh plugin installed successfully!"
     echo ""
     echo "Next steps:"
@@ -90,11 +90,11 @@ install_oh_my_zsh_plugin() {
 # Install standalone version
 install_standalone() {
     log_info "Installing standalone version to $INSTALL_DIR"
-    
+
     # Create installation directory
     mkdir -p "$INSTALL_DIR"
     cd "$INSTALL_DIR"
-    
+
     # Clone or update repository
     if [ -d ".git" ]; then
         log_info "Updating existing installation..."
@@ -109,20 +109,20 @@ install_standalone() {
         log_info "Cloning repository..."
         git clone "$REPO_URL" .
     fi
-    
+
     # Create virtual environment
     log_info "Creating Python virtual environment..."
     python3 -m venv venv
     source venv/bin/activate
-    
+
     # Install dependencies and package
     log_info "Installing Python dependencies..."
     pip install --upgrade pip boto3 botocore
     pip install -e .
-    
+
     # Create shell integration file
     log_info "Setting up shell integration..."
-    
+
     # Determine shell
     if [ -n "$ZSH_VERSION" ]; then
         SHELL_RC="$HOME/.zshrc"
@@ -135,10 +135,10 @@ install_standalone() {
         SHELL_RC="$HOME/.bashrc"
         SHELL_NAME="bash"
     fi
-    
+
     # Add to shell RC if not already present
     INTEGRATION_LINE="source $INSTALL_DIR/aws-profile.sh"
-    
+
     if ! grep -q "aws-profile.sh" "$SHELL_RC" 2>/dev/null; then
         echo "" >> "$SHELL_RC"
         echo "# AWS Profile Switcher" >> "$SHELL_RC"
@@ -147,7 +147,7 @@ install_standalone() {
     else
         log_info "Shell integration already present in $SHELL_RC"
     fi
-    
+
     log_success "Standalone installation completed!"
     echo ""
     echo "Next steps:"
@@ -158,20 +158,20 @@ install_standalone() {
 # Uninstall function
 uninstall() {
     log_info "Uninstalling AWS Profile Switcher..."
-    
+
     # Remove Oh My Zsh plugin
     local plugin_dir="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/$PLUGIN_NAME"
     if [ -d "$plugin_dir" ]; then
         rm -rf "$plugin_dir"
         log_success "Oh My Zsh plugin removed"
     fi
-    
+
     # Remove standalone installation
     if [ -d "$INSTALL_DIR" ]; then
         rm -rf "$INSTALL_DIR"
         log_success "Standalone installation removed"
     fi
-    
+
     # Remove shell integration (ask user)
     for rc_file in ~/.zshrc ~/.bashrc; do
         if [ -f "$rc_file" ] && grep -q "aws-profile" "$rc_file"; then
@@ -187,26 +187,26 @@ uninstall() {
             fi
         fi
     done
-    
+
     log_success "Uninstallation completed!"
 }
 
 # Check prerequisites
 check_prerequisites() {
     log_info "Checking prerequisites..."
-    
+
     # Check Python
     if ! command_exists python3; then
         log_error "Python 3 is required but not installed"
         exit 1
     fi
-    
+
     # Check Git
     if ! command_exists git; then
         log_error "Git is required but not installed"
         exit 1
     fi
-    
+
     # Check AWS CLI
     if ! command_exists aws; then
         log_warning "AWS CLI not found. Please install AWS CLI v2 for SSO support"
@@ -215,7 +215,7 @@ check_prerequisites() {
         aws_version=$(aws --version 2>&1 | head -n1)
         log_info "Found: $aws_version"
     fi
-    
+
     # Check for existing installation
     if command_exists aws-profile; then
         log_warning "aws-profile command already exists"
@@ -228,7 +228,7 @@ main() {
     echo "🚀 AWS Profile Switcher Installer"
     echo "=================================="
     echo ""
-    
+
     # Parse arguments
     case "${1:-}" in
         --uninstall)
@@ -262,13 +262,13 @@ main() {
             exit 1
             ;;
     esac
-    
+
     check_prerequisites
-    
+
     echo ""
     log_info "Installation method: $INSTALL_METHOD"
     echo ""
-    
+
     case "$INSTALL_METHOD" in
         oh-my-zsh)
             install_oh_my_zsh_plugin
@@ -281,7 +281,7 @@ main() {
             exit 1
             ;;
     esac
-    
+
     echo ""
     echo "🎉 Installation complete!"
     echo ""

@@ -61,7 +61,7 @@ echo "5️⃣ Testing AWS CLI..."
 if command -v aws >/dev/null 2>&1; then
     aws_version=$(aws --version 2>&1 | head -n1)
     echo "✅ AWS CLI found: $aws_version"
-    
+
     if [[ $aws_version == *"aws-cli/2"* ]]; then
         echo "✅ AWS CLI v2 detected (recommended for SSO)"
     else
@@ -91,7 +91,7 @@ fi
 # Test 7: Installation method detection
 echo "7️⃣ Detecting installation method..."
 if [ -n "$ZSH_VERSION" ] && [ -n "$ZSH_CUSTOM" ]; then
-    if [ -d "${ZSH_CUSTOM}/plugins/aws-profile-switcher" ]; then
+    if [ -d "${ZSH_CUSTOM}/plugins/aws-profile-extension" ]; then
         echo "✅ Oh My Zsh plugin installation detected"
     else
         echo "ℹ️  Oh My Zsh available but plugin not installed in custom directory"
@@ -123,6 +123,6 @@ fi
 
 echo ""
 echo "For help:"
-echo "- Full documentation: README.md"  
+echo "- Full documentation: README.md"
 echo "- Distribution guide: DISTRIBUTION.md"
 echo "- Oh My Zsh plugin: oh-my-zsh-plugin/README.md"
